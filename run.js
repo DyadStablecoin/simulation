@@ -6,7 +6,8 @@ import dnftABI from "./abi/dNFT.json" assert { type: "json" };
 
 dotenv.config();
 
-const { TENDERLY_USER, TENDERLY_PROJECT, TENDERLY_ACCESS_KEY } = process.env;
+const { TENDERLY_USER, TENDERLY_PROJECT, TENDERLY_ACCESS_KEY, INFURA } =
+  process.env;
 const TENDERLY_FORK_API = `https://api.tenderly.co/api/v1/account/${TENDERLY_USER}/project/${TENDERLY_PROJECT}/fork`;
 
 const opts = {
@@ -14,12 +15,17 @@ const opts = {
     "X-Access-Key": TENDERLY_ACCESS_KEY,
   },
 };
-const body = {
-  network_id: "5",
-  block_number: 8111409,
-};
 
 async function run() {
+  const gp = new ethers.providers.JsonRpcProvider(INFURA);
+  const blockNumber = await gp.getBlockNumber();
+
+  console.log(blockNumber);
+  const body = {
+    network_id: "5",
+    block_number: blockNumber,
+  };
+
   let forkId;
   await axios
     .post(TENDERLY_FORK_API, body, opts)
